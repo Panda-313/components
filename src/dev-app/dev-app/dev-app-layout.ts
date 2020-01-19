@@ -7,10 +7,17 @@
  */
 
 import {Directionality} from '@angular/cdk/bidi';
-import {OverlayContainer} from '@angular/cdk/overlay';
-import {ChangeDetectorRef, Component, ElementRef, Inject, ViewEncapsulation} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  OnInit,
+  ViewEncapsulation
+} from '@angular/core';
 import {DevAppRippleOptions} from './ripple-options';
 import {DevAppDirectionality} from './dev-app-directionality';
+import {DevAppTheme} from './dev-app-theme';
 
 /** Root component for the dev-app demos. */
 @Component({
@@ -19,8 +26,7 @@ import {DevAppDirectionality} from './dev-app-directionality';
   styleUrls: ['dev-app-layout.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DevAppLayout {
-  dark = false;
+export class DevAppLayout implements OnInit {
   navItems = [
     {name: 'Examples', route: '/examples'},
     {name: 'Autocomplete', route: '/autocomplete'},
@@ -85,10 +91,14 @@ export class DevAppLayout {
   ];
 
   constructor(
-      private _element: ElementRef<HTMLElement>, private _overlayContainer: OverlayContainer,
-      public rippleOptions: DevAppRippleOptions,
+      private _element: ElementRef<HTMLElement>,
+      public rippleOptions: DevAppRippleOptions, public theme: DevAppTheme,
       @Inject(Directionality) public dir: DevAppDirectionality, cdr: ChangeDetectorRef) {
     dir.change.subscribe(() => cdr.markForCheck());
+  }
+
+  ngOnInit(): void {
+    this.theme.elementToTheme = this._element.nativeElement;
   }
 
   toggleFullscreen() {
@@ -102,20 +112,6 @@ export class DevAppLayout {
       elem.mozRequestFullScreen();
     } else if (elem.msRequestFullScreen) {
       elem.msRequestFullScreen();
-    }
-  }
-
-  toggleTheme() {
-    const darkThemeClass = 'demo-unicorn-dark-theme';
-
-    this.dark = !this.dark;
-
-    if (this.dark) {
-      this._element.nativeElement.classList.add(darkThemeClass);
-      this._overlayContainer.getContainerElement().classList.add(darkThemeClass);
-    } else {
-      this._element.nativeElement.classList.remove(darkThemeClass);
-      this._overlayContainer.getContainerElement().classList.remove(darkThemeClass);
     }
   }
 }
